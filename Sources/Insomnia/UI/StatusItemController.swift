@@ -635,6 +635,10 @@ final class StatusItemController: NSObject {
     /// Width, from the item's right edge, of the area the end control sits in.
     private static let endZoneWidth: CGFloat = 30
 
+    static func isInEndZone(buttonMaxX: CGFloat, pointerX: CGFloat) -> Bool {
+        buttonMaxX - pointerX <= endZoneWidth
+    }
+
     /// A left click in the end control's zone while a session runs. The zone
     /// is read from the pointer's position on screen, not from the event or
     /// SwiftUI's hit test: macOS reports a click on a status item at the
@@ -646,7 +650,7 @@ final class StatusItemController: NSObject {
         guard model.phase.showsRunningControls, manager.isActive,
               let button, let window = button.window, event.window === window else { return false }
         let frame = window.convertToScreen(button.convert(button.bounds, to: nil))
-        guard frame.maxX - NSEvent.mouseLocation.x <= Self.endZoneWidth else { return false }
+        guard Self.isInEndZone(buttonMaxX: frame.maxX, pointerX: NSEvent.mouseLocation.x) else { return false }
         holdToEnd()
         return true
     }
